@@ -10,7 +10,7 @@ single_char = input("Enter a single character: ")
 if len(single_char)!=1 or single_char==" ":
     print("Error: Character must be a single character.")
     exit()
-print("Searching for "+ single_char + " in hello")
+print("Searching for "+ single_char + " in "+ word_input)
 count_instance = 0
 if word_input[0]== single_char:
     print(single_char + " found" + " at index 0")
