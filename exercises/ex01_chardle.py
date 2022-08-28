@@ -7,7 +7,7 @@ if len(word_input) != 5:
     print("Error: Word must contain 5 characters")
     exit()
 single_char = input("Enter a single character: ")
-if len(single_char) !=1 or single_char == " ":
+if len(single_char) != 1 or single_char == " ":
     print("Error: Character must be a single character.")
     exit()
 print("Searching for " + single_char + " in " + word_input)
@@ -32,4 +32,4 @@ if count_instance == 0:
 elif count_instance == 1:
     print(str(count_instance) + " instance of " + single_char + " found in " + word_input)
 else:
-    print(str(count_instance) +" instances of " + single_char + " found in " + word_input)
+    print(str(count_instance) + " instances of " + single_char + " found in " + word_input)
