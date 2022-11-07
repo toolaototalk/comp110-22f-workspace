@@ -1,5 +1,9 @@
 """Constants used through the simulation."""
 
+VULNERABLE: int = 0
+INFECTED: int = 1
+NUM_INFECTED: int = 5
+
 BOUNDS_WIDTH: int = 400
 MAX_X: float = BOUNDS_WIDTH / 2
 MIN_X: float = -MAX_X
@@ -11,5 +15,5 @@ MIN_Y: float = -MAX_Y
 VIEW_HEIGHT: int = BOUNDS_HEIGHT + 20
 
 CELL_RADIUS: int = 15
-CELL_COUNT: int = 1
+CELL_COUNT: int = 50
 CELL_SPEED: float = 5.0
