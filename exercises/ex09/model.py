@@ -26,8 +26,10 @@ class Point:
         return Point(x, y)
 
     def distance(self, other: Point) -> float:
-        distance: float = sqrt((self.x - other.x)^2 + (self.y + other.y)^2)
+        """Calculate the distance between self and given point."""
+        distance: float = sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
         return distance
+
 
 class Cell:
     """An individual subject in the simulation."""
@@ -45,54 +47,83 @@ class Cell:
     # the result of adding the self object's location with its
     # direction. Hint: Look at the add method.
     def tick(self) -> None:
-        self.location: Point = self.location.add(self.direction)   
+        """Update sickness."""
+        self.location: Point = self.location.add(self.direction)
+        if self.is_infected() and self.sickness < constants.RECOVERY_PERIOD:  
+            self.sickness += 1 
+        elif self.sickness >= constants.RECOVERY_PERIOD:
+            self.immunize()
 
     def color(self) -> str:
         """Return the color representation of a cell."""
         if self.is_vulnerable():
-            return "grey"
-        return "orange"
+            return "gray"
+        if self.is_infected():
+            return "yellow"
+        if self.is_immune():
+            return "white"
 
     def contract_disease(self) -> None:
+        """Infect a cell."""
         self.sickness = constants.INFECTED
         return
 
     def is_vulnerable(self) -> bool:
+        """Return Vulnerability."""
         return self.sickness == constants.VULNERABLE
 
     def is_infected(self) -> bool:
-        return self.sickness == constants.INFECTED
+        """Return if cell is infected."""
+        return self.sickness >= constants.INFECTED
 
     def contact_with(self, other: Cell):
-        if self.is_infected or other.is_infected:
-            self.contract_disease
-            other.contract_disease
+        """Update sickness when contact."""
+        if self.is_infected() or other.is_infected():
+            if self.is_vulnerable():
+                self.contract_disease()
+            if other.is_vulnerable():
+                other.contract_disease()
+
+    def immunize(self):
+        """Immunize a cell."""
+        self.sickness = constants.IMMUNE
+    
+    def is_immune(self):
+        """Check if a cell is immune."""
+        return self.sickness == constants.IMMUNE
+
+
 class Model:
     """The state of the simulation."""
 
     population: list[Cell]
     time: int = 0
 
-    def __init__(self, cells: int, speed: float, num_infected: int):
+    def __init__(self, cells: int, speed: float, num_infected: int, num_immune: int = 0):
         """Initialize the cells with random locations and directions."""
         if num_infected >= cells or num_infected <= 0:
             raise ValueError
+        if num_immune >= cells or num_immune < 0:
+            raise ValueError
+        if num_immune + num_infected >= cells:
+            raise ValueError
         self.population = []
         for _ in range(cells):
-            start_location: Point = self.random_location
+            start_location: Point = self.random_location()
             start_direction: Point = self.random_direction(speed)
-            cell : Cell = Cell(start_location, start_direction)
+            cell: Cell = Cell(start_location, start_direction)
             self.population.append(cell)
         for i in range(num_infected):
-            self.population[i].contract_disease
+            self.population[i].contract_disease()
+        for j in range(num_immune):
+            self.population[-j - 1].immunize()
 
-        
-    
     def tick(self) -> None:
         """Update the state of the simulation by one time step."""
         self.time += 1
         for cell in self.population:
             cell.tick()
+        self.check_contacts()
 
     def random_location(self) -> Point:
         """Generate a random location."""
@@ -108,14 +139,12 @@ class Model:
         return Point(direction_x, direction_y)
 
     def check_contacts(self) -> None:
-        for i in len(self.population):
-            for j in range(i, len(self.population)):
+        """Check contacts."""
+        for i in range(len(self.population)):
+            for j in range(i + 1, len(self.population)):
                 if self.population[i].location.distance(self.population[j].location) < constants.CELL_RADIUS:
                     self.population[i].contact_with(self.population[j])
         return
-
-
-
 
     def enforce_bounds(self, cell: Cell) -> None:
         """Cause a cell to 'bounce' if it goes out of bounds."""
@@ -125,4 +154,7 @@ class Model:
 
     def is_complete(self) -> bool:
         """Method to indicate when the simulation is complete."""
-        return False
+        for cell in self.population:
+            if cell.is_infected():
+                return False
+        return True

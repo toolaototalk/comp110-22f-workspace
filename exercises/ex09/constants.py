@@ -3,6 +3,9 @@
 VULNERABLE: int = 0
 INFECTED: int = 1
 NUM_INFECTED: int = 5
+NUM_IMMUNE: int = 2
+IMMUNE: int = -1
+RECOVERY_PERIOD: int = 90
 
 BOUNDS_WIDTH: int = 400
 MAX_X: float = BOUNDS_WIDTH / 2
